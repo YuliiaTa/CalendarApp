@@ -22,4 +22,8 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    public void setOwner(User user) {
+        this.owner = user;
+    }
 }

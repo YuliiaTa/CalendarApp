@@ -1,11 +1,15 @@
 package com.yuliia.app.calendar.service;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import com.yuliia.app.calendar.dto.AuthResponse;
+import com.yuliia.app.calendar.dto.LoginRequest;
+import com.yuliia.app.calendar.dto.RegisterRequest;
+import com.yuliia.app.calendar.exception.AuthException;
 import com.yuliia.app.calendar.model.User;
 import com.yuliia.app.calendar.repository.UserRepository;
 import com.yuliia.app.calendar.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -14,31 +18,31 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public String register(User user) {
-        // Проверка на существующего пользователя
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return "Email already exists";
+    public AuthResponse register(RegisterRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new AuthException("Email already in use");
         }
 
-        // Шифрование пароля и сохранение
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
         User savedUser = userRepository.save(user);
+        String token = jwtUtil.generateToken(savedUser.getEmail());
         
-        // Генерация токена
-        return jwtUtil.generateToken(savedUser.getEmail());
+        return new AuthResponse(token, savedUser.getEmail(), savedUser.getName());
     }
 
-    public String login(String email, String password) {
-        // Поиск пользователя
-        User user = userRepository.findByEmail(email)
-            .orElse(null);
+    public AuthResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AuthException("Invalid credentials"));
 
-        // Проверка пароля
-        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-            return "Invalid email or password";
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new AuthException("Invalid credentials");
         }
 
-        // Генерация токена
-        return jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getEmail());
+        return new AuthResponse(token, user.getEmail(), user.getName());
     }
 }
