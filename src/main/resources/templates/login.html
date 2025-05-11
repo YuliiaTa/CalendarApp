@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Your Calendar</title>
+    <style>
+        :root {
+            --peach-light: #FFF5F5;
+            --peach-medium: #FFE8E8;
+            --peach-dark: #FFD6D6;
+            --yellow-light: #FFF9E6;
+            --yellow-medium: #FFEEB3;
+            --yellow-dark: #FFE380;
+            --pink-light: #FFD6E5;
+            --pink-medium: #FFB3D1;
+            --text-soft: #5A4A42;
+            --text-dark: #3A2E28;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--yellow-light), var(--peach-light));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(255, 182, 193, 0.2);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        h1 {
+            color: var(--text-dark);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 28px;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-soft);
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--peach-medium);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: var(--peach-light);
+            color: var(--text-dark);
+        }
+        
+        input::placeholder {
+            color: #C4A79D;
+            opacity: 0.6;
+        }
+        
+        input:focus {
+            border-color: var(--pink-medium);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(255, 179, 209, 0.2);
+            background-color: white;
+        }
+        
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(to right, var(--pink-medium), var(--yellow-dark));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            background: linear-gradient(to right, var(--yellow-dark), var(--pink-medium));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 179, 209, 0.4);
+        }
+        
+        .link {
+            text-align: center;
+            margin-top: 24px;
+            color: var(--text-soft);
+            font-size: 15px;
+        }
+        
+        a {
+            color: var(--pink-medium);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+            border-bottom: 1px dashed var(--pink-medium);
+            padding-bottom: 2px;
+        }
+        
+        a:hover {
+            color: var(--yellow-dark);
+            border-bottom-color: var(--yellow-dark);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo span {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--pink-medium), var(--yellow-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+        
+        .illustration {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 60px;
+            color: var(--pink-medium);
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="illustration">☀️</div>
+        <div class="logo">
+            <span>SunnyCalendar</span>
+        </div>
+        <h1>Welcome Back!</h1>
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <label for="username">Email</label>
+                <input type="email" id="username" name="username" placeholder="your.email@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit">Sign In</button>
+        </form>
+        <div class="link">
+            New here? <a href="/register">Create account</a>
+        </div>
+    </div>
+</body>
+</html>
