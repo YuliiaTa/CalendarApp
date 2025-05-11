@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | SunnyCalendar</title>
+    <title>Register | Calendar</title>
     <style>
         :root {
             --peach-light: #FFF5F5;
@@ -169,8 +169,13 @@
         <div class="logo">
             <span>SunnyCalendar</span>
         </div>
-        <h1>Join Us Today</h1>
-        <form method="POST" action="/api/auth/register">
+        <h1>Create Account</h1>
+        
+        <div th:if="${param.success}" class="success-message">
+            Registration successful! Please login.
+        </div>
+        
+        <form th:action="@{/register}" method="post">
             <div class="form-group">
                 <label for="name">Full Name</label>
                 <input type="text" id="name" name="name" placeholder="Alex Sunshine" required>
@@ -184,8 +189,9 @@
                 <input type="password" id="password" name="password" placeholder="••••••••" required>
                 <div class="password-hint">At least 8 characters with numbers</div>
             </div>
-            <button type="submit">Create Account</button>
+            <button type="submit">Register</button>
         </form>
+        
         <div class="link">
             Already have an account? <a href="/login">Sign in</a>
         </div>

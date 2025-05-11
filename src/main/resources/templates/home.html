@@ -2,22 +2,318 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Calendar</title>
+    <style>
+        :root {
+            --peach-light: #FFF5F5;
+            --peach-medium: #FFE8E8;
+            --yellow-light: #FFF9E6;
+            --yellow-dark: #FFE380;
+            --pink-medium: #FFB3D1;
+            --text-dark: #3A2E28;
+            --calendar-border: #f0e6ff;
+            --today-bg: #ffebee;
+            --weekend-bg: #fff8e1;
+            --event-bg: #e3f2fd;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--peach-light), var(--yellow-light));
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--pink-medium), var(--yellow-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--pink-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .welcome-message {
+            font-size: 24px;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+        }
+        
+        .calendar-container {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(255, 182, 193, 0.2);
+        }
+        
+        .logout-btn {
+            padding: 8px 16px;
+            background: var(--pink-medium);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: var(--yellow-dark);
+        }
+        
+        /* Calendar styles */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .calendar-nav-btn {
+            background: var(--peach-medium);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .calendar-nav-btn:hover {
+            background: var(--pink-medium);
+            color: white;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            padding: 10px;
+            background: var(--peach-medium);
+            border-radius: 8px;
+        }
+        
+        .calendar-day {
+            min-height: 100px;
+            padding: 8px;
+            border: 1px solid var(--calendar-border);
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .calendar-day-number {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .calendar-day.today {
+            background-color: var(--today-bg);
+            border: 2px solid var(--pink-medium);
+        }
+        
+        .calendar-day.weekend {
+            background-color: var(--weekend-bg);
+        }
+        
+        .calendar-day.other-month {
+            opacity: 0.5;
+            background-color: #f9f9f9;
+        }
+        
+        .calendar-event {
+            font-size: 12px;
+            background: var(--event-bg);
+            padding: 2px 4px;
+            border-radius: 4px;
+            margin-top: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .add-event-btn {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--pink-medium);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>Register</h1>
-    <form method="POST" action="/api/auth/register">
-        <div>
-            <label>Name: <input type="text" name="name"></label>
+    <div class="container">
+        <header>
+            <div class="logo">Calendar</div>
+            <div class="user-info">
+                <div class="avatar" th:text="${#strings.substring(username, 0, 1)}"></div>
+                <div class="user-email" th:text="${email}"></div>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </header>
+        
+        <h1 class="welcome-message">
+            Welcome, <span th:text="${username}"></span>!
+        </h1>
+        
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <h2 class="calendar-title" id="current-month">Май 2025</h2>
+                <div class="calendar-nav">
+                    <button class="calendar-nav-btn" onclick="previousMonth()">Назад</button>
+                    <button class="calendar-nav-btn" onclick="nextMonth()">Вперёд</button>
+                </div>
+            </div>
+            
+            <div class="calendar-grid">
+                <div class="calendar-day-header">Пн</div>
+                <div class="calendar-day-header">Вт</div>
+                <div class="calendar-day-header">Ср</div>
+                <div class="calendar-day-header">Чт</div>
+                <div class="calendar-day-header">Пт</div>
+                <div class="calendar-day-header weekend">Сб</div>
+                <div class="calendar-day-header weekend">Вс</div>
+                
+                <div id="calendar-days" class="calendar-grid" style="grid-column: 1 / -1;"></div>
+            </div>
         </div>
-        <div>
-            <label>Email: <input type="email" name="email"></label>
-        </div>
-        <div>
-            <label>Password: <input type="password" name="password"></label>
-        </div>
-        <button type="submit">Register</button>
-    </form>
-    <a href="/login">Login</a>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        
+        const monthNames = [
+            "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+            "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+        ];
+       
+        const monthNamesGenitive = [
+            "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня",
+            "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"
+        ];
+        
+        function renderCalendar() {
+            document.getElementById('current-month').textContent = 
+                `${monthNamesGenitive[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+            
+            let startingDay = firstDay.getDay();
+            if (startingDay === 0) startingDay = 7;
+            startingDay -= 1;
+            
+            const prevMonthLastDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0).getDate();
+            
+            const today = new Date();
+            const isCurrentMonth = currentDate.getMonth() === today.getMonth() && 
+                                 currentDate.getFullYear() === today.getFullYear();
+            
+            let calendarHtml = '';
+            
+            for (let i = 0; i < startingDay; i++) {
+                const day = prevMonthLastDay - startingDay + i + 1;
+                calendarHtml += `<div class="calendar-day other-month">
+                    <div class="calendar-day-number">${day}</div>
+                </div>`;
+            }
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                const isToday = isCurrentMonth && i === today.getDate();
+                const dayOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), i).getDay();
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                
+                calendarHtml += `<div class="calendar-day ${isToday ? 'today' : ''} ${isWeekend ? 'weekend' : ''}">
+                    <div class="calendar-day-number">${i}</div>
+                    <button class="add-event-btn">+</button>
+                </div>`;
+            }
+            
+            const totalCells = startingDay + daysInMonth;
+            const remainingCells = totalCells <= 35 ? 35 - totalCells : 42 - totalCells;
+            
+            for (let i = 1; i <= remainingCells; i++) {
+                calendarHtml += `<div class="calendar-day other-month">
+                    <div class="calendar-day-number">${i}</div>
+                </div>`;
+            }
+            
+            document.getElementById('calendar-days').innerHTML = calendarHtml;
+            
+            document.querySelectorAll('.add-event-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const day = this.parentElement.querySelector('.calendar-day-number').textContent;
+                    alert(`Добавить событие на ${day} ${monthNamesGenitive[currentDate.getMonth()]} ${currentDate.getFullYear()}`);
+                });
+            });
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+        
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        renderCalendar();
+    </script>
 </body>
 </html>
