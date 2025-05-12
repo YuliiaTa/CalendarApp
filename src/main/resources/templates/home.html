@@ -408,7 +408,9 @@
             const dayOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), i).getDay();
             const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
-            calendarHtml += `<div class="calendar-day ${isToday ? 'today' : ''} ${isWeekend ? 'weekend' : ''}" data-date="${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}">
+            const formattedDate = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+
+            calendarHtml += `<div class="calendar-day ${isToday ? 'today' : ''} ${isWeekend ? 'weekend' : ''}" data-date="${formattedDate}">
                 <div class="calendar-day-number">${i}</div>
                 <div class="events-container"></div>
                 <button class="add-event-btn" onclick="openEventModal(${i})">+</button>
@@ -427,17 +429,21 @@
         document.getElementById('calendar-days').innerHTML = calendarHtml;
     }
 
+    function renderCalendarAndEvents() {
+        renderCalendar();
+        loadAllEvents(); // Загружаем все события после рендера
+    }
+
     function previousMonth() {
         currentDate.setMonth(currentDate.getMonth() - 1);
-        renderCalendar();
+        renderCalendarAndEvents();
     }
 
     function nextMonth() {
         currentDate.setMonth(currentDate.getMonth() + 1);
-        renderCalendar();
+        renderCalendarAndEvents();
     }
 
-    // Modal functions
     function openEventModal(day) {
         selectedDay = day;
         const formattedDate = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
@@ -454,17 +460,14 @@
         document.getElementById('eventForm').reset();
     }
 
-    // Close modal when clicking on X
     document.querySelector('.close').addEventListener('click', closeModal);
 
-    // Close modal when clicking outside of it
     window.addEventListener('click', function(event) {
         if (event.target === document.getElementById('eventModal')) {
             closeModal();
         }
     });
 
-    // Handle form submission
     document.getElementById('eventForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -482,7 +485,7 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                [csrfHeader]: csrfToken // Добавляем CSRF токен в заголовки
+                [csrfHeader]: csrfToken
             },
             body: JSON.stringify(eventData)
         })
@@ -495,46 +498,41 @@
         .then(data => {
             console.log('Событие добавлено:', data);
             closeModal();
-            renderCalendar(); // Обновить календарь
-            loadEventsForDay(eventData.date); // Загрузить события для дня
+            renderCalendarAndEvents(); // Обновить всё после добавления
         })
         .catch((error) => {
             console.error('Ошибка:', error);
         });
     });
 
-    // Загрузка событий для конкретного дня
-    function loadEventsForDay(date) {
-        const dayElement = document.querySelector(`[data-date="${date}"]`);
+    // Загрузка событий для всех отображаемых дней
+    function loadAllEvents() {
+        const dayElements = document.querySelectorAll('.calendar-day[data-date]');
 
-        if (dayElement) {
-            const eventsContainer = dayElement.querySelector('.events-container');
-            eventsContainer.innerHTML = ''; // Очищаем события
+        dayElements.forEach(dayEl => {
+            const date = dayEl.getAttribute('data-date');
+            const eventsContainer = dayEl.querySelector('.events-container');
+            if (!eventsContainer) return;
+
+            eventsContainer.innerHTML = '';
 
             fetch(`/events/by-date/${date}`)
                 .then(response => response.json())
                 .then(events => {
-                    if (events.length === 0) {
-                        console.log('Нет событий для выбранной даты.');
-                    } else {
-                        events.forEach(event => {
-                            const eventElement = document.createElement('div');
-                            eventElement.className = 'calendar-event';
-                            eventElement.textContent = event.title;
-                            eventsContainer.appendChild(eventElement);
-                        });
-                    }
+                    events.forEach(event => {
+                        const eventElement = document.createElement('div');
+                        eventElement.className = 'calendar-event';
+                        eventElement.textContent = event.title;
+                        eventsContainer.appendChild(eventElement);
+                    });
                 })
                 .catch(error => {
-                    console.error('Ошибка при загрузке событий:', error);
+                    console.error(`Ошибка при загрузке событий для ${date}:`, error);
                 });
-        } else {
-            console.log('Элемент для дня не найден');
-        }
+        });
     }
 
-
-    renderCalendar(); // Инициализация календаря
+    renderCalendarAndEvents(); // Инициализация календаря со всеми событиями
 </script>
 
 </body>
