@@ -15,6 +15,11 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
+    // Добавляем геттер для user
+    public User getUser() {
+        return user;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();

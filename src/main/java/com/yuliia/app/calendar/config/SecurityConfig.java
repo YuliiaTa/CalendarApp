@@ -1,5 +1,6 @@
 package com.yuliia.app.calendar.config;
 
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository; // Добавьте этот импорт
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,7 +32,8 @@ public class SecurityConfig {
                 .permitAll()
             )
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/h2-console/**")
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .ignoringRequestMatchers("/h2-console/**") // если используете H2 console
             )
             .headers(headers -> headers
                 .frameOptions().sameOrigin()

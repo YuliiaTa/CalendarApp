@@ -1,29 +1,26 @@
 package com.yuliia.app.calendar.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 
 import java.util.UUID;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "events")
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    
+
     private String title;
     private String description;
-    private String date;
+
+    private LocalDate date; // исправлено
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
-
-    public void setOwner(User user) {
-        this.owner = user;
-    }
 }
