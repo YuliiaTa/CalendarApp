@@ -142,7 +142,7 @@
 
     function renderCalendarAndEvents() {
         renderCalendar();
-        loadAllEvents(); // Загружаем все события после рендера
+        loadAllEvents();
     }
 
     function previousMonth() {
@@ -209,14 +209,13 @@
         .then(data => {
             console.log('Событие добавлено:', data);
             closeModal();
-            renderCalendarAndEvents(); // Обновить всё после добавления
+            renderCalendarAndEvents();
         })
         .catch((error) => {
             console.error('Ошибка:', error);
         });
     });
 
-    // Загрузка событий для всех отображаемых дней
     function loadAllEvents() {
         const dayElements = document.querySelectorAll('.calendar-day[data-date]');
 
@@ -243,7 +242,7 @@
         });
     }
 
-    renderCalendarAndEvents(); // Инициализация календаря со всеми событиями
+    renderCalendarAndEvents();
 </script>
 
 </body>
